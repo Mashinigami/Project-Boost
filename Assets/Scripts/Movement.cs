@@ -10,10 +10,12 @@ public class Movement : MonoBehaviour
 
     // cached reference
     Rigidbody rigidbodyCache;
+    AudioSource audioSourceCache;
     // Start is called before the first frame update
     void Start()
     {
         rigidbodyCache = GetComponent<Rigidbody>();
+        audioSourceCache = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -28,6 +30,14 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         {
             rigidbodyCache.AddRelativeForce(Vector3.up * Time.deltaTime * thrustRate);
+            if (!audioSourceCache.isPlaying)
+            {
+                audioSourceCache.Play();
+            }
+        }
+        else
+        {
+            audioSourceCache.Stop();
         }
     }
 
