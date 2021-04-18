@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    // variables
+    // PARAMETERS
     [SerializeField] float thrustRate = 1000f;
     [SerializeField] float rotationSensitivity = 100f;
+    [SerializeField] AudioClip mainEngineSFX;
+    [SerializeField] ParticleSystem leftThrusterVFX;
+    [SerializeField] ParticleSystem rightThrusterVFX;
+    [SerializeField] ParticleSystem mainEngineVFX;
 
-    // cached reference
+    // CACHE
     Rigidbody rigidbodyCache;
     AudioSource audioSourceCache;
-    // Start is called before the first frame update
+
     void Start()
     {
         rigidbodyCache = GetComponent<Rigidbody>();
         audioSourceCache = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         ProcessThrust();
@@ -29,28 +32,73 @@ public class Movement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidbodyCache.AddRelativeForce(Vector3.up * Time.deltaTime * thrustRate);
-            if (!audioSourceCache.isPlaying)
-            {
-                audioSourceCache.Play();
-            }
+            StartThrusting();
         }
         else
         {
-            audioSourceCache.Stop();
+            StopThrusting();
         }
+    }
+
+    void StartThrusting()
+    {
+        rigidbodyCache.AddRelativeForce(Vector3.up * Time.deltaTime * thrustRate);
+        if (!audioSourceCache.isPlaying)
+        {
+            audioSourceCache.PlayOneShot(mainEngineSFX);
+        }
+
+        if (!mainEngineVFX.isPlaying)
+        {
+            mainEngineVFX.Play();
+        }
+    }
+
+    void StopThrusting()
+    {
+        audioSourceCache.Stop();
+        mainEngineVFX.Stop();
     }
 
     void ProcessRotation()
     {
         if (Input.GetKey(KeyCode.A))
         {
-            ApplyRotation(Vector3.forward);
+            RotateLeft();
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            ApplyRotation(Vector3.back);
+            RotateRight();
         }
+        else
+        {
+            StopRotating();
+        }
+    }
+
+    void RotateLeft()
+    {
+        ApplyRotation(Vector3.forward);
+
+        if (!leftThrusterVFX.isPlaying)
+        {
+            leftThrusterVFX.Play();
+        }
+    }
+
+    private void RotateRight()
+    {
+        ApplyRotation(Vector3.back);
+        if (!rightThrusterVFX.isPlaying)
+        {
+            rightThrusterVFX.Play();
+        }
+    }
+
+    void StopRotating()
+    {
+        leftThrusterVFX.Stop();
+        rightThrusterVFX.Stop();
     }
 
     private void ApplyRotation(Vector3 axis)
